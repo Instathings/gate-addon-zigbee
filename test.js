@@ -1,4 +1,4 @@
 const GateAddOnSensorTag = require('./index');
 
-const gaST = new GateAddOnSensorTag();
-gaST.start();
+const gaST = new GateAddOnSensorTag({});
+gaST.init();
