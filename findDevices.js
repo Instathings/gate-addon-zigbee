@@ -1,6 +1,6 @@
 function lookForId(knownDevices, newId) {
   let isKnown = false;
-  for (let i = 0; i < knownDevices.length && isKnown; i += 1) {
+  for (let i = 0; i < knownDevices.length && !isKnown; i += 1) {
     const knownId = knownDevices[i].ieeeAddr;
     if (knownId === newId) {
       isKnown = true;
