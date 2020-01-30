@@ -1,6 +1,6 @@
 function lookForId(knownDevices, newId) {
   let isKnown = false;
-  for (let i = 0; i < knownDevices.length || isKnown; i += 1) {
+  for (let i = 0; i < knownDevices.length && isKnown; i += 1) {
     const knownId = knownDevices[i].ieeeAddr;
     if (knownId === newId) {
       isKnown = true;
@@ -29,7 +29,11 @@ module.exports = function findDevices(callback) {
       const deviceId = device.ieeeAddr;
       const isKnown = lookForId(this.knownDevices, deviceId);
       if (!isKnown) {
-        const newDevice = { ieeeAddr: device.ieeeAddr };
+        const newDevice =
+        {
+          ieeeAddr: device.ieeeAddr,
+          protocol: 'zigbee',
+        };
         clearTimeout(timeoutId);
         clearInterval(intervalId);
         return callback(null, newDevice);
