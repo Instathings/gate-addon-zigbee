@@ -31,7 +31,7 @@ class ZigBee2MQTTAddOnSensorTag extends EventEmitter {
               console.log(err);
             }
             this.start();
-          })
+          });
         });
       });
     });
