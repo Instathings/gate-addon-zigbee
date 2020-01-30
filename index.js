@@ -16,6 +16,8 @@ class ZigBee2MQTTAddOnSensorTag extends EventEmitter {
       password: process.env.MQTT_PASSWORD,
     });
     this.client.on('connect', () => {
+      this.client.publish('zigbee2mqtt/bridge/config/force_remove', '0x00158d0004018344');
+      this.client.publish('zigbee2mqtt/bridge/config/force_remove', '0x00158d0003d2d12a');
       this.client.subscribe('zigbee2mqtt/bridge/config/devices', (err) => {
         if (err) {
           debug(err);
@@ -39,17 +41,22 @@ class ZigBee2MQTTAddOnSensorTag extends EventEmitter {
 
   start() {
     const { ieeeAddr } = this.newDevice;
-    this.client.subscribe(`zibgee2mqtt/${ieeeAddr}`, (err) => {
-      if (err) {
-        debug(err);
-      }
-    });
-
+    console.log('DEVICE', this.newDevice);
+    const topic = `zigbee2mqtt/${ieeeAddr}`;
+    console.log('TOPIC', topic)
     this.client.on('message', (topic, message) => {
-      debug(topic);
-      debug(message);
+      console.log('ON MESSAGE', message);
       this.emit('data', message);
     });
+
+    this.client.subscribe(topic, (err) => {
+      if (err) {
+        console.log('ERR', err)
+      }
+      console.log('OK');
+    });
+
+
   }
 
   stop() { }

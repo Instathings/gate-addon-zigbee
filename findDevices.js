@@ -36,6 +36,7 @@ module.exports = function findDevices(callback) {
         };
         clearTimeout(timeoutId);
         clearInterval(intervalId);
+        console.log('NEWDEVICE', newDevice);
         return callback(null, newDevice);
       }
     }
