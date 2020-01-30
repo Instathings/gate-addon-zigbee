@@ -29,11 +29,14 @@ module.exports = function findDevices(callback) {
       const deviceId = device.ieeeAddr;
       const isKnown = lookForId(this.knownDevices, deviceId);
       if (!isKnown) {
-        const newDevice = { ieeeAddr: device.ieeeAddr };
+        const newDevice = {
+          ieeeAddr: device.ieeeAddr,
+          protocol: 'zigbee',
+        };
         clearTimeout(timeoutId);
         clearInterval(intervalId);
         return callback(null, newDevice);
       }
     }
   });
-}
+};
