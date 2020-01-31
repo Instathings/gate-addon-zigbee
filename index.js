@@ -3,21 +3,19 @@ const EventEmitter = require('events');
 const mqtt = require('mqtt');
 const findDevices = require('./findDevices');
 
-class ZigBee2MQTTAddOnSensorTag extends EventEmitter {
+class GateAddOnZigbee extends EventEmitter {
   constructor(allDevices) {
     super();
     this.data = {};
     this.knownDevices = allDevices.zigbee || [];
-  }
-
-  init() {
     this.client = mqtt.connect('mqtt://localhost', {
       username: process.env.MQTT_USERNAME,
       password: process.env.MQTT_PASSWORD,
     });
+  }
+
+  init() {
     this.client.on('connect', () => {
-      //this.client.publish('zigbee2mqtt/bridge/config/force_remove', '0x00158d0004018344');
-      //this.client.publish('zigbee2mqtt/bridge/config/force_remove', '0x00158d0003d2d12a');
       this.client.subscribe('zigbee2mqtt/bridge/config/devices', (err) => {
         if (err) {
           debug(err);
@@ -27,22 +25,21 @@ class ZigBee2MQTTAddOnSensorTag extends EventEmitter {
           if (err) {
             throw err;
           }
-          this.newDevice = newDevice;
           this.emit('newDevice', newDevice);
           this.client.unsubscribe('zigbee2mqtt/bridge/config/devices', (err) => {
             if (err) {
               console.log(err);
             }
-            this.start();
+            this.start(newDevice);
           });
         });
       });
     });
   }
 
-  start() {
-    const { ieeeAddr } = this.newDevice;
-    console.log('DEVICE', this.newDevice);
+  start(device) {
+    const { ieeeAddr } = device;
+    console.log('DEVICE', device);
     const topic = `zigbee2mqtt/${ieeeAddr}`;
     console.log('TOPIC', topic)
     this.client.on('message', (topic, message) => {
