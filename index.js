@@ -8,7 +8,7 @@ class GateAddOnZigbee extends EventEmitter {
     super();
     this.data = {};
     this.knownDevices = allDevices.zigbee || [];
-    this.client = mqtt.connect('mqtt://localhost', {
+    this.client = mqtt.connect('mqtt://mosquitto', {
       username: process.env.MQTT_USERNAME,
       password: process.env.MQTT_PASSWORD,
     });
@@ -26,9 +26,9 @@ class GateAddOnZigbee extends EventEmitter {
             throw err;
           }
           this.emit('newDevice', newDevice);
-          this.client.unsubscribe('zigbee2mqtt/bridge/config/devices', (err) => {
-            if (err) {
-              console.log(err);
+          this.client.unsubscribe('zigbee2mqtt/bridge/config/devices', (error) => {
+            if (error) {
+              console.log(error);
             }
             this.start(newDevice);
           });
@@ -41,7 +41,7 @@ class GateAddOnZigbee extends EventEmitter {
     const { ieeeAddr } = device;
     console.log('DEVICE', device);
     const topic = `zigbee2mqtt/${ieeeAddr}`;
-    console.log('TOPIC', topic)
+    console.log('TOPIC', topic);
     this.client.on('message', (topic, message) => {
       const parsed = JSON.parse(message.toString());
       console.log('ON MESSAGE', parsed);
@@ -50,14 +50,12 @@ class GateAddOnZigbee extends EventEmitter {
 
     this.client.subscribe(topic, (err) => {
       if (err) {
-        console.log('ERR', err)
+        console.log('ERR', err);
       }
       console.log('OK');
     });
-
-
   }
 
   stop() { }
 }
-module.exports = ZigBee2MQTTAddOnSensorTag;
+module.exports = GateAddOnZigbee;
