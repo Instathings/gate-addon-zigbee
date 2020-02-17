@@ -1,4 +1,4 @@
-const debug = require('debug')('gate-add-on-zigbee2mqtt');
+const debug = require('debug')('gate-addon-zigbee');
 const EventEmitter = require('events');
 const mqtt = require('mqtt');
 const findDevices = require('./findDevices');
@@ -28,7 +28,7 @@ class GateAddOnZigbee extends EventEmitter {
           this.emit('newDevice', newDevice);
           this.client.unsubscribe('zigbee2mqtt/bridge/config/devices', (error) => {
             if (error) {
-              console.log(error);
+              debug(error);
             }
             this.start(newDevice);
           });
@@ -39,20 +39,20 @@ class GateAddOnZigbee extends EventEmitter {
 
   start(device) {
     const { ieeeAddr } = device;
-    console.log('DEVICE', device);
+    debug('DEVICE', device);
     const topic = `zigbee2mqtt/${ieeeAddr}`;
-    console.log('TOPIC', topic);
+    debug('TOPIC', topic);
     this.client.on('message', (topic, message) => {
       const parsed = JSON.parse(message.toString());
-      console.log('ON MESSAGE', parsed);
+      debug('ON MESSAGE', parsed);
       this.emit('data', parsed);
     });
 
     this.client.subscribe(topic, (err) => {
       if (err) {
-        console.log('ERR', err);
+        debug('ERR', err);
       }
-      console.log('OK');
+      debug('OK');
     });
   }
 

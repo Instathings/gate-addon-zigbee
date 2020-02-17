@@ -1,3 +1,5 @@
+const debug = require('debug')('gate-addon-zigbee');
+
 function lookForId(knownDevices, newId) {
   let isKnown = false;
   for (let i = 0; i < knownDevices.length && !isKnown; i += 1) {
@@ -20,7 +22,7 @@ module.exports = function findDevices(callback) {
 
   this.client.on('message', (topic, message) => {
     const connectedDevices = JSON.parse(message.toString());
-    console.log(message.toString());
+    debug(message.toString());
     const connectedEndDevices = connectedDevices.filter((value) => {
       return value.type === 'EndDevice';
     });
@@ -36,7 +38,7 @@ module.exports = function findDevices(callback) {
         };
         clearTimeout(timeoutId);
         clearInterval(intervalId);
-        console.log('NEWDEVICE', newDevice);
+        debug('NEWDEVICE', newDevice);
         return callback(null, newDevice);
       }
     }
