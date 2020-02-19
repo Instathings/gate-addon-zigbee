@@ -4,7 +4,7 @@ const mqtt = require('mqtt');
 const findDevices = require('./findDevices');
 
 class GateAddOnZigbee extends EventEmitter {
-  constructor(allDevices) {
+  constructor(allDevices, options = {}) {
     super();
     this.data = {};
     this.knownDevices = allDevices.zigbee || [];
@@ -12,6 +12,7 @@ class GateAddOnZigbee extends EventEmitter {
       username: process.env.MQTT_USERNAME,
       password: process.env.MQTT_PASSWORD,
     });
+    this.touchlink = options.touchlink;
   }
 
   init() {
@@ -19,6 +20,9 @@ class GateAddOnZigbee extends EventEmitter {
       this.client.subscribe('zigbee2mqtt/bridge/config/devices', (err) => {
         if (err) {
           debug(err);
+        }
+        if (this.touchlink) {
+          this.client.publish('zigbee2mqtt/bridge/config/touchlink/factory_reset', JSON.stringify({}));
         }
         findDevices.call(this, (err, newDevice) => {
           this.client.removeAllListeners('message');
