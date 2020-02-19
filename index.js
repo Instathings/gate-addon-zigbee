@@ -1,6 +1,7 @@
 const debug = require('debug')('gate-add-on-zigbee2mqtt');
 const EventEmitter = require('events');
 const mqtt = require('mqtt');
+const async = require('async');
 const findDevices = require('./findDevices');
 
 class GateAddOnZigbee extends EventEmitter {
@@ -8,36 +9,61 @@ class GateAddOnZigbee extends EventEmitter {
     super();
     this.data = {};
     this.knownDevices = allDevices.zigbee || [];
-    this.client = mqtt.connect('mqtt://mosquitto', {
+    this.client = mqtt.connect('mqtt://localhost:1883', {
       username: process.env.MQTT_USERNAME,
       password: process.env.MQTT_PASSWORD,
     });
     this.touchlink = options.touchlink;
   }
 
+  subscribe(callback) {
+    this.client.subscribe('zigbee2mqtt/bridge/config/devices', (err) => {
+      if (err) {
+        return callback(err);
+      }
+      return callback();
+    });
+  }
+
+  factoryReset(callback) {
+    if (this.touchlink) {
+      console.log('debuggonee', this.touchlink);
+      return this.client.publish('zigbee2mqtt/bridge/config/touchlink/factory_reset', JSON.stringify({}), (err) => {
+        if (err) {
+          return callback(err);
+        }
+        setTimeout(() => {
+          return callback();
+        }, 5000);
+      });
+    }
+    return callback();
+  }
+
   init() {
     this.client.on('connect', () => {
-      this.client.subscribe('zigbee2mqtt/bridge/config/devices', (err) => {
-        if (err) {
-          debug(err);
-        }
-        if (this.touchlink) {
-          this.client.publish('zigbee2mqtt/bridge/config/touchlink/factory_reset', JSON.stringify({}));
-        }
-        findDevices.call(this, (err, newDevice) => {
-          this.client.removeAllListeners('message');
+      async.waterfall([
+        this.subscribe.bind(this),
+        this.factoryReset.bind(this)
+      ],
+        (err) => {
           if (err) {
             throw err;
           }
-          this.emit('newDevice', newDevice);
-          this.client.unsubscribe('zigbee2mqtt/bridge/config/devices', (error) => {
-            if (error) {
-              console.log(error);
+          findDevices.call(this, (err, newDevice) => {
+            this.client.removeAllListeners('message');
+            if (err) {
+              throw err;
             }
-            this.start(newDevice);
+            this.emit('newDevice', newDevice);
+            this.client.unsubscribe('zigbee2mqtt/bridge/config/devices', (error) => {
+              if (error) {
+                console.log(error);
+              }
+              this.start(newDevice);
+            });
           });
         });
-      });
     });
   }
 
