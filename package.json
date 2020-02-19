@@ -1,22 +1,21 @@
 {
   "name": "@instathings/gate-addon-zigbee",
-  "version": "0.0.5",
-  "description": "",
+  "version": "1.0.0",
+  "description": "Instathings addon for supporting Zigbee protocol",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "slog": "node utils/forceRemove"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Instathings/gate-addon-zigbee2mqtt.git"
+    "url": "git+https://github.com/Instathings/gate-addon-zigbee.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Instathings/gate-addon-zigbee2mqtt/issues"
+    "url": "https://github.com/Instathings/gate-addon-zigbee/issues"
   },
-  "homepage": "https://github.com/Instathings/gate-addon-zigbee2mqtt#readme",
+  "homepage": "https://github.com/Instathings/gate-addon-zigbee#readme",
   "dependencies": {
     "async": "^3.1.1",
     "debug": "^4.1.1",

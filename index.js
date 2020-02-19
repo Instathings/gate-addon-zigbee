@@ -1,4 +1,4 @@
-const debug = require('debug')('gate-add-on-zigbee2mqtt');
+const debug = require('debug')('gate-addon-zigbee');
 const EventEmitter = require('events');
 const mqtt = require('mqtt');
 const async = require('async');
@@ -44,45 +44,44 @@ class GateAddOnZigbee extends EventEmitter {
     this.client.on('connect', () => {
       async.waterfall([
         this.subscribe.bind(this),
-        this.factoryReset.bind(this)
-      ],
-        (err) => {
-          if (err) {
-            throw err;
+        this.factoryReset.bind(this),
+      ], (err) => {
+        if (err) {
+          throw err;
+        }
+        findDevices.call(this, (findingErr, newDevice) => {
+          this.client.removeAllListeners('message');
+          if (findingErr) {
+            throw findingErr;
           }
-          findDevices.call(this, (err, newDevice) => {
-            this.client.removeAllListeners('message');
-            if (err) {
-              throw err;
+          this.emit('newDevice', newDevice);
+          this.client.unsubscribe('zigbee2mqtt/bridge/config/devices', (error) => {
+            if (error) {
+              console.log(error);
             }
-            this.emit('newDevice', newDevice);
-            this.client.unsubscribe('zigbee2mqtt/bridge/config/devices', (error) => {
-              if (error) {
-                console.log(error);
-              }
-              this.start(newDevice);
-            });
+            this.start(newDevice);
           });
         });
+      });
     });
   }
 
   start(device) {
     const { ieeeAddr } = device;
-    console.log('DEVICE', device);
+    debug('DEVICE', device);
     const topic = `zigbee2mqtt/${ieeeAddr}`;
-    console.log('TOPIC', topic);
+    debug('TOPIC', topic);
     this.client.on('message', (topic, message) => {
       const parsed = JSON.parse(message.toString());
-      console.log('ON MESSAGE', parsed);
+      debug('ON MESSAGE', parsed);
       this.emit('data', parsed);
     });
 
     this.client.subscribe(topic, (err) => {
       if (err) {
-        console.log('ERR', err);
+        debug('ERR', err);
       }
-      console.log('OK');
+      debug('OK');
     });
   }
 
