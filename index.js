@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const debug = require('debug')('gate-addon-zigbee');
 const EventEmitter = require('events');
 const mqtt = require('mqtt');
@@ -5,15 +6,21 @@ const async = require('async');
 const findDevices = require('./findDevices');
 
 class GateAddOnZigbee extends EventEmitter {
-  constructor(allDevices, options = {}) {
+  constructor(id, allDevices, options = {}) {
     super();
+    this.id = id;
     this.data = {};
     this.knownDevices = allDevices.zigbee || [];
-    this.client = mqtt.connect('mqtt://localhost:1883', {
+
+    this.client = mqtt.connect('mqtt://mosquitto', {
       username: process.env.MQTT_USERNAME,
       password: process.env.MQTT_PASSWORD,
     });
     this.touchlink = options.touchlink;
+  }
+
+  setKnownDevices(knownDevices) {
+    this.knownDevices = knownDevices;
   }
 
   subscribe(callback) {
@@ -27,7 +34,6 @@ class GateAddOnZigbee extends EventEmitter {
 
   factoryReset(callback) {
     if (this.touchlink) {
-      console.log('debuggonee', this.touchlink);
       return this.client.publish('zigbee2mqtt/bridge/config/touchlink/factory_reset', JSON.stringify({}), (err) => {
         if (err) {
           return callback(err);
@@ -86,5 +92,22 @@ class GateAddOnZigbee extends EventEmitter {
   }
 
   stop() { }
+
+  control(payload) {
+    console.log(this.knownDevices);
+    const zigbeeDevice = this.knownDevices.filter((zigbeeDeviceFilter) => {
+      return zigbeeDeviceFilter.id === this.id;
+    })[0];
+    console.log('ZIGBEE DEVICE', zigbeeDevice);
+    const friendlyName = _.get(zigbeeDevice, 'ieeeAddr');
+    console.log('FRIENDLY NAME', friendlyName);
+
+    const topic = `zigbee2mqtt/${friendlyName}/set`;
+    console.log('PUBLISH ON TOPIC', topic, payload);
+    this.client.publish(topic, JSON.stringify(payload), (err) => {
+      console.log('ERR', err);
+    });
+  }
 }
+
 module.exports = GateAddOnZigbee;
