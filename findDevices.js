@@ -24,7 +24,7 @@ module.exports = function findDevices(callback) {
     const connectedDevices = JSON.parse(message.toString());
     debug(message.toString());
     const connectedEndDevices = connectedDevices.filter((value) => {
-      return value.type === 'EndDevice';
+      return value.type === 'EndDevice' || value.type === 'Router';
     });
     for (let i = 0; i < connectedEndDevices.length; i += 1) {
       const device = connectedEndDevices[i];
