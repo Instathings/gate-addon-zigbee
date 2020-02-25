@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2020-02-25
+### Added
+- `setKnownDevices` method
+- `control` method
+
+## [1.0.0] - 2020-02-17
+### Changed
+- first public version
+- replaced `console.log` with `debug`
+
 ## [0.0.5] - 2020-02-07
 ### Changed
 - changed package name
