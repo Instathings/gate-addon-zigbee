@@ -19,6 +19,10 @@ class GateAddOnZigbee extends EventEmitter {
     this.touchlink = options.touchlink;
   }
 
+  setKnownDevices(knownDevices) {
+    this.knownDevices = knownDevices;
+  }
+
   subscribe(callback) {
     this.client.subscribe('zigbee2mqtt/bridge/config/devices', (err) => {
       if (err) {
@@ -90,13 +94,20 @@ class GateAddOnZigbee extends EventEmitter {
   stop() { }
 
   control(payload) {
+    console.log(this.knownDevices);
     const zigbeeDevice = this.knownDevices.filter((zigbeeDeviceFilter) => {
       return zigbeeDeviceFilter.id === this.id;
     })[0];
+    console.log('ZIGBEE DEVICE', zigbeeDevice);
     const friendlyName = _.get(zigbeeDevice, 'ieeeAddr');
+    console.log('FRIENDLY NAME', friendlyName);
+
     const topic = `zigbee2mqtt/${friendlyName}/set`;
+    console.log('PUBLISH ON TOPIC', topic, payload);
     this.client.publish(topic, JSON.stringify(payload), (err) => {
+      console.log('ERR', err);
     });
   }
 }
+
 module.exports = GateAddOnZigbee;
