@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.3] - 2020-02-25
+### Changed
+- `timeoutDiscovering` event is emitted after pairing timeout
+- pairing only with devices that contains `modelId` key
+
 ## [1.0.2] - 2020-02-25
 ### Changed
 - A new device is paired only if `modelId` is defined
