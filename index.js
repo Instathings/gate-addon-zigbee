@@ -58,14 +58,21 @@ class GateAddOnZigbee extends EventEmitter {
         findDevices.call(this, (findingErr, newDevice) => {
           this.client.removeAllListeners('message');
           if (findingErr) {
-            throw findingErr;
+            const payload = {
+              status: {
+                eventType: 'not_paired',
+              },
+              deviceId: this.id,
+            };
+            this.emit('timeoutDiscovering', payload);
+          } else {
+            this.emit('newDevice', newDevice);
+            this.start(newDevice);
           }
-          this.emit('newDevice', newDevice);
           this.client.unsubscribe('zigbee2mqtt/bridge/config/devices', (error) => {
             if (error) {
               console.log(error);
             }
-            this.start(newDevice);
           });
         });
       });
