@@ -6,11 +6,12 @@ const async = require('async');
 const findDevices = require('./findDevices');
 
 class GateAddOnZigbee extends EventEmitter {
-  constructor(id, allDevices, options = {}) {
+  constructor(id, type, allDevices, options = {}) {
     super();
     this.id = id;
     this.data = {};
     this.knownDevices = allDevices.zigbee || [];
+    this.deviceType = type;
 
     this.client = mqtt.connect('mqtt://mosquitto', {
       username: process.env.MQTT_USERNAME,
@@ -81,37 +82,48 @@ class GateAddOnZigbee extends EventEmitter {
 
   start(device) {
     const { ieeeAddr } = device;
-    debug('DEVICE', device);
     const topic = `zigbee2mqtt/${ieeeAddr}`;
-    debug('TOPIC', topic);
     this.client.on('message', (topic, message) => {
       const parsed = JSON.parse(message.toString());
-      debug('ON MESSAGE', parsed);
       this.emit('data', parsed);
     });
-
-    this.client.subscribe(topic, (err) => {
-      if (err) {
-        debug('ERR', err);
-      }
-      debug('OK');
-    });
+    if (this.deviceType.type === 'sensor') {
+      this.client.subscribe(topic, (err) => {
+        if (err) {
+          debug('ERR', err);
+        }
+        debug('OK');
+      });
+    }
   }
 
   stop() { }
 
-  control(payload) {
-    console.log(this.knownDevices);
+  control(message, action) {
     const zigbeeDevice = this.knownDevices.filter((zigbeeDeviceFilter) => {
       return zigbeeDeviceFilter.id === this.id;
     })[0];
-    console.log('ZIGBEE DEVICE', zigbeeDevice);
     const friendlyName = _.get(zigbeeDevice, 'ieeeAddr');
-    console.log('FRIENDLY NAME', friendlyName);
+    const topic = `zigbee2mqtt/${friendlyName}/${action}`;
 
-    const topic = `zigbee2mqtt/${friendlyName}/set`;
-    console.log('PUBLISH ON TOPIC', topic, payload);
-    this.client.publish(topic, JSON.stringify(payload), (err) => {
+    if (action === 'get') {
+      const responseTopic = `zigbee2mqtt/${friendlyName}`;
+      this.client.once('message', (topic, responseMessage) => {
+        const parsed = JSON.parse(responseMessage.toString());
+        this.client.unsubscribe(responseTopic, (err) => { });
+        const response = {
+          payload: parsed,
+          requestId: message.requestId,
+          deviceId: message.deviceId,
+          projectId: process.env.PROJECT_ID
+        };
+        this.emit('status', response);
+      });
+      this.client.subscribe(responseTopic, (err) => { });
+    }
+
+    const payloadDevice = (action === 'get') ? message.payload : message;
+    this.client.publish(topic, JSON.stringify(payloadDevice), (err) => {
       console.log('ERR', err);
     });
   }
