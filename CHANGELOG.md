@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2020-03-02
+### Added
+- `type` as second parameter in the constructor 
+- instance emits `status` event
+### Changed
+- subscribing to `zigbee2mqtt/:friendlyName` only if device type is sensor
+- `control` method handles `get` action
+
 ## [1.0.3] - 2020-02-25
 ### Changed
 - `timeoutDiscovering` event is emitted after pairing timeout
