@@ -13,7 +13,7 @@ class GateAddOnZigbee extends EventEmitter {
     this.knownDevices = allDevices.zigbee || [];
     this.deviceType = type;
 
-    this.client = mqtt.connect('mqtt://localhost', {
+    this.client = mqtt.connect('mqtt://mosquitto', {
       username: process.env.MQTT_USERNAME,
       password: process.env.MQTT_PASSWORD,
     });
