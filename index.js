@@ -114,6 +114,34 @@ class GateAddOnZigbee extends EventEmitter {
     const payloadDevice = (action === 'get') ? message.payload : message;
     this.client.publish(topic, JSON.stringify(payloadDevice));
   }
+
+  remove() {
+    const zigbeeDevice = this.knownDevices.filter((zigbeeDeviceFilter) => {
+      return zigbeeDeviceFilter.id === this.id;
+    })[0];
+    const friendlyName = _.get(zigbeeDevice, 'ieeeAddr');
+
+    this.subscribe((err) => {
+      this.client.on('message', (topic, message) => {
+        if (topic !== 'zigbee2mqtt/bridge/log') {
+          return;
+        }
+        const logMessage = JSON.parse(message.toString());
+        const messageType = logMessage.type;
+        if (messageType !== 'device_force_removed') {
+          return;
+        }
+        const friendlyNameRemoved = logMessage.message;
+        if (friendlyNameRemoved === friendlyName) {
+          this.emit('deviceRemoved', this.id);
+          // this.client.removeAllListeners();
+          // this.removeAllListeners();
+        }
+      })
+    })
+    const topic = `zigbee2mqtt/bridge/config/force_remove`;
+    this.client.publish(topic, friendlyName);
+  }
 }
 
 module.exports = GateAddOnZigbee;
