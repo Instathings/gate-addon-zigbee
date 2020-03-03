@@ -82,12 +82,7 @@ class GateAddOnZigbee extends EventEmitter {
       this.emit('data', parsed);
     });
     if (this.deviceType.type === 'sensor') {
-      this.client.subscribe(topic, (err) => {
-        if (err) {
-          debug('ERR', err);
-        }
-        debug('OK');
-      });
+      this.client.subscribe(topic);
     }
   }
 
@@ -117,9 +112,7 @@ class GateAddOnZigbee extends EventEmitter {
     }
 
     const payloadDevice = (action === 'get') ? message.payload : message;
-    this.client.publish(topic, JSON.stringify(payloadDevice), (err) => {
-      console.log('ERR', err);
-    });
+    this.client.publish(topic, JSON.stringify(payloadDevice));
   }
 }
 
