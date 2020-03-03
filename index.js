@@ -13,7 +13,7 @@ class GateAddOnZigbee extends EventEmitter {
     this.knownDevices = allDevices.zigbee || [];
     this.deviceType = type;
 
-    this.client = mqtt.connect('mqtt://mosquitto', {
+    this.client = mqtt.connect('mqtt://localhost', {
       username: process.env.MQTT_USERNAME,
       password: process.env.MQTT_PASSWORD,
     });
@@ -25,7 +25,7 @@ class GateAddOnZigbee extends EventEmitter {
   }
 
   subscribe(callback) {
-    this.client.subscribe('zigbee2mqtt/bridge/config/devices', (err) => {
+    return this.client.subscribe('zigbee2mqtt/bridge/log', (err) => {
       if (err) {
         return callback(err);
       }
@@ -48,35 +48,29 @@ class GateAddOnZigbee extends EventEmitter {
   }
 
   init() {
+    this.on('internalNewDeviceTimeout', () => {
+      const payload = {
+        status: {
+          eventType: 'not_paired',
+        },
+        deviceId: this.id,
+      };
+      this.emit('timeoutDiscovering', payload);
+    });
+
+    this.on('internalNewDevice', (newDevice) => {
+      this.client.removeAllListeners('message');
+      this.client.unsubscribe('zigbee2mqtt/bridge/log');
+      this.emit('newDevice', newDevice);
+      this.start(newDevice);
+    })
+
     this.client.on('connect', () => {
       async.waterfall([
         this.subscribe.bind(this),
+        findDevices.bind(this),
         this.factoryReset.bind(this),
-      ], (err) => {
-        if (err) {
-          throw err;
-        }
-        findDevices.call(this, (findingErr, newDevice) => {
-          this.client.removeAllListeners('message');
-          if (findingErr) {
-            const payload = {
-              status: {
-                eventType: 'not_paired',
-              },
-              deviceId: this.id,
-            };
-            this.emit('timeoutDiscovering', payload);
-          } else {
-            this.emit('newDevice', newDevice);
-            this.start(newDevice);
-          }
-          this.client.unsubscribe('zigbee2mqtt/bridge/config/devices', (error) => {
-            if (error) {
-              console.log(error);
-            }
-          });
-        });
-      });
+      ]);
     });
   }
 
