@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.3] - 2020-03-04
+### Fixed
+- Reading knownDevices from protocolId
+
 ## [1.1.2] - 2020-03-03
 ### Fixed
 - ip address mosquitto server
