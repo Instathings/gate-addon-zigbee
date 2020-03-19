@@ -2,7 +2,7 @@
 
 This addon extends [Instathings Gate](https://github.com/Instathings/gate) for supporting Zigbee protocol.
 
-### Get started 
+### Get started
 
 This addon is meant to be used inside the gate Docker container and will be installed automatically once the device pairing procedure is launched from the [Editor](https://editor.instathings.io).
 
