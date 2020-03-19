@@ -24,3 +24,7 @@ This addon extends the EventEmitter class, you can listen to the following event
 - `newDevice`: emitted when a new device is successfully paired to the Gateway
 - `deviceRemoved`: emitted when a known device is unpaired from the Gateway
 - `timeoutDiscovering`: emitted if after 30s of discovery a new device has not been found
+
+### License
+gate-addon-zigbee is [fair-code](http://faircode.io/) licensed under [Apache 2.0 with Commons Clause](./LICENSE.md)
+
