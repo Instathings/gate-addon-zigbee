@@ -17,13 +17,13 @@
   },
   "homepage": "https://github.com/Instathings/gate-addon-zigbee#readme",
   "dependencies": {
-    "async": "^3.1.1",
+    "async": "^3.2.0",
     "debug": "^4.1.1",
     "mqtt": "^3.0.0"
   },
   "devDependencies": {
     "eslint": "^6.8.0",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-plugin-import": "^2.20.0"
+    "eslint-config-airbnb-base": "^14.1.0",
+    "eslint-plugin-import": "^2.20.1"
   }
 }
