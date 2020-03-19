@@ -1,6 +1,6 @@
 {
   "name": "@instathings/gate-addon-zigbee",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "Instathings addon for supporting Zigbee protocol",
   "main": "index.js",
   "scripts": {
