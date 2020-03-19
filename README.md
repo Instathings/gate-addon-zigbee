@@ -6,6 +6,8 @@ This addon extends [Instathings Gate](https://github.com/Instathings/gate) for s
 
 This addon is meant to be used inside the gate Docker container and will be installed automatically once the device pairing procedure is launched from the [Editor](https://editor.instathings.io).
 
+For hardware specific documentation refer to [our documentation](https://docs.instathings.io/docs/guides/working-zigbee.html).
+
 ### Device pairing
 
 Pairing a new Zigbee is quite easy: 
