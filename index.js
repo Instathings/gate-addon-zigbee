@@ -134,12 +134,12 @@ class GateAddOnZigbee extends EventEmitter {
         const friendlyNameRemoved = logMessage.message;
         if (friendlyNameRemoved === friendlyName) {
           this.emit('deviceRemoved', this.id);
-          // this.client.removeAllListeners();
-          // this.removeAllListeners();
+          this.removeAllListeners();
+          this.client.end();
         }
-      })
-    })
-    const topic = `zigbee2mqtt/bridge/config/force_remove`;
+      });
+    });
+    const topic = 'zigbee2mqtt/bridge/config/force_remove';
     this.client.publish(topic, friendlyName);
   }
 }
