@@ -55,6 +55,8 @@ class GateAddOnZigbee extends EventEmitter {
         },
         deviceId: this.id,
       };
+      this.removeAllListeners();
+      this.client.end();
       this.emit('timeoutDiscovering', payload);
     });
 
